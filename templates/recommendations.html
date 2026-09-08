@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scaled=1.0">
+    <title>Recommendations</title>
+
+    <style>
+        body{
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background-color: #f4f6f8;
+            color: #333;
+        }
+        header{
+            background-color: #1f4e79;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        .container{
+            width: 90%;
+            max-width: 900px;
+            margin: 30px auto;
+        }
+        .card{
+            background-color: white;
+            padding: 25px;
+            border-radius: 10px;
+            margin-button: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        .card h2{
+            color: #1f4e79;
+        }
+        .recommendation{
+            border-left: 5px solid #1f4e79;
+            padding: 15px;
+            margin: 15px 0;
+            background-color: #f8f9fa;
+        }
+        .back{
+            display: inline-block;
+            margin-top: 10px;
+            background-color: #1f4e79;
+            color: white;
+            padding: 10px 18px;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>Academic Recommendations</h1>
+        <p>Personalized support based on your performances</p>
+    </header>
+    <div class="container">
+
+        <div class="card">
+            <h2>Your Recommendations</h2>
+
+            <div class="recommendation">
+                <h3>Mathematics</h3>
+                <p>Your result indicates that you may need additional support in Mathematics.</p>
+                <p>
+                    <strong>Recommendation:</strong>
+                    Work with a Mathematics mentor and practice problem-solving execises regularly.
+                </p>
+            </div>
+
+            <div class="recommendation">
+                <h3>Physics</h3>
+                <p>Your physics result suggest that you could benefit from additional academic support.</p>
+                <p>
+                    <strong>Recommendation:</strong>
+                    Review difficult conceptsand connect with a Physics mentor.
+                </p>
+            </div>
+
+             <div class="recommendation">
+                <h3>Programming</h3>
+                <p>Your Programming performance is good.</p>
+                <p>
+                    <strong>Recommendation:</strong>
+                    Continue practicing and try more advanced level programming exercises.
+                </p>
+            </div>
+        </div>
+
+            <div class="card">
+                <h2>General Advice</h2>
+                <p>Focus more on the subjects wehre your grades are below expected level.</p>
+                <p>You can also use the Mentorship section to find a mentor who is specialized in your difficlut subjects.</p>
+            </div>
+
+        <a href="/dashboard" class="back">Back to Dashboard</a>
+    </div>
+</body>
+</html>
