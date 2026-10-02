@@ -323,7 +323,7 @@ def view_mentor(student_id=None):
     if not mentor:
         cursor.execute("""
             SELECT id, mentor_id
-            FROM mentor_requests
+            FROM mentor_request
             WHERE student_id =? AND status = "pending"
             """, (student_id,))
         pending_request = cursor.fetchone()
