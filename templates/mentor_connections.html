@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My Students</title>
+</head>
+<body>
+    <h1>My Connected Students</h1>
+    {% if connections %}
+        {% for connection in connections %}
+            <div>
+                <h2>Student: {{ connection[0] }}</h2>
+                <p>Mentor: {{connection[1] }}</p>
+                <p>Specialization: {{connection[2ss] }}</p>
+                <p>Status: Connected</p>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p>You don't have any connected student yet.</p>
+    {% endif %}
+</body>
+</html>

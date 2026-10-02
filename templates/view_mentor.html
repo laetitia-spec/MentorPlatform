@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My Mentor</title>
+</head>
+<body>
+    <h1>My Mentor</h1>
+    {% if mentor %}
+    <p><strong>ID:</strong>{{ mentor[0] }}</p>
+    <p><strong>Name:</strong>{{ mentor[1] }}</p>
+    <p><strong>Email:</strong>{{ mentor[2] }}</p>
+    {% else %}
+    <p>No mentor assigned yet {{ student_id }}.</p>
+    {% endif %}
+    <a href="/student/{{ student_id }}"><button>Back</button></a>
+</body>
+</html>

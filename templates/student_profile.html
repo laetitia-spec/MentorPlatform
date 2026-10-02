@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Student Profile</title>
+</head>
+
+<body>
+    <h1>Student Profile</h1>
+    <p><strong>Student ID:</strong> {{ student[0] }}</p>
+    <p><strong>Name:</strong> {{ student[1] }}</p>
+    <h2>Academic Performance</h2>
+    <p>
+        <a href="/student/{{ student[0] }}/performance">
+            <button type="button">View Academic Performance</button>
+       </a>
+    </p>
+    <div class="card">
+        <h3>Mentor</h3>
+        <p>View the mentor assigned to this student.</p>
+        <a href="/view_mentor/{{ student[0] }}">
+            <button>View Mentor</button>
+        </a>
+    </div>
+    <br>
+    <a href="/connected_students">
+        <button type="button">Back to connected students</button>
+    </a>
+</body>
+</html>

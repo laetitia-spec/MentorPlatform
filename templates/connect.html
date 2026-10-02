@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Connect with Mentor</title>
+</head>
+<body>
+    <h1>Connect with a Mentor</h1>
+    <p>You can now request to connect with a mentor.</p>
+    {% if message %}
+        <p>{{ message }}</p>
+    {% endif %}
+    <form action="/connect" method="POST">
+        <input type="hidden" name="mentor_id" value="{{ mentor_id}}">s
+        <button type="submit">Send Connection Request</button>
+    </form>
+</body>
+</html>

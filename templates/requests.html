@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Connection Requests</title>
+</head>
+
+<body>
+    <h1>Connection Requests</h1>
+
+    {% if connection_requests %}
+      <table border="1" cellpadding="10">
+        <tr>
+          <th>Student</th>
+          <th>Mentor</th>
+          <th>Specialization</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+
+        {% for req in connection_requests %}
+        <tr>
+          <td>{{ req[1] }}</td>
+          <td>{{ req[2] }}</td>
+          <td>{{ req[3] }}</td>
+          <td>{{ req.[4] }}</td>
+          <td>
+            {% if req[4] == "Pending" %}
+
+              <form action="/accept-request" method="POST" style="display:inline;">
+                <input type="hidden" name="request_id" value="{{ req[0] }}">
+                <button type="submit">Accept</button>
+              </form>
+
+              <form action="/decline-request" method="POST" style="display:inline;">
+                <input type="hidden" name="request_id" value="{{ req[0] }}"> 
+                <button type="submit">Decline</button>
+              </form>
+            {% else %}
+              No action
+          {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </table>
+    {% else %}
+    <p>No connection requests yet.</p>
+    {% endif %}   
+</body>
+</html>

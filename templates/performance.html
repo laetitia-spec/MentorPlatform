@@ -75,34 +75,25 @@
             <h2>Your Academic Results</h2>
             <table>
                 <tr>
-                    <th>Course</th>
-                    <th>Grade</th>
+                    <th>Sunject</th>
+                    <th>Score</th>
                     <th>Status</th>
                 </tr>
-
+                {% for subject, score in gardes.items() %}
                 <tr>
-                    <td>Mathematics</td>
-                    <td>45%</td>
+                    <td>{{ course }}</td>
+                    <td>{{ score }}</td>
+                    {% if score < 60 %}
                     <td class="warning">Needs Improvement</td>
-                </tr>
-
-                <tr>
-                    <td>Programming</td>
-                    <td>72%</td>
+                    {% elif score < 75 %}
                     <td class="good">Good</td>
+                    {% else %}
+                    <td class="excellent">Excellent</td>
+                    {% endif %}
                 </tr>
+                {% endfor %}
+            
 
-                <tr>
-                    <td>Physics</td>
-                    <td>58%</td>
-                    <td class="warning">Needs Improvement</td>
-                </tr>
-
-                <tr>
-                    <td>Computer Network</td>
-                    <td>80%</td>
-                    <td class="good">Execellent</td>
-                </tr>
             </table>
         </div>
 

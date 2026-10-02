@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My Connections</title>
+</head>
+<body>
+    <h1>My Connections</h1>
+    {% if connections %}
+        {% for connection in connections %}
+            <div>
+                <h2>{{ connection[0] }}</h2>
+                <p>Specialization: {{ connection[1] }}</p>
+                <P>Status: Connected</p>
+            </div>
+            <hr>
+        {% endfor %}
+    {% else %}
+        <p>You don't have any accepted connections yet.</p>
+    {% endif %}
+</body>
+</html>

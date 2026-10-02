@@ -1,0 +1,35 @@
+<!DOCTYPE>
+<html>
+<head>
+    <title>My Connected Students</title>
+</head>
+<body>
+    <h1>My Connected Students</h1>
+
+    {% if students %}
+        <table border="1" cellpadding="10">
+            <tr>
+                <th>Student ID</th>
+                <th>Specialization</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+
+            {% for student in students %}
+            <tr>
+                <td>{{ student[0] }}</td>
+                <td>{{ student[1] }}</td>
+                <td>{{ student[2] }}</td>
+                <td>
+                    <a href="/student/{{ student[0] }}">
+                        <button type="button">View Student</button>
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+    {% else %}
+        <p>No connected student.</p>
+    {% endif %}
+</body>
+</html>
