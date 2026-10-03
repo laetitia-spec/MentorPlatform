@@ -62,7 +62,7 @@ def create_test_users():
         cursor.execute("""
             INSERT OR IGNORE INTO users (name, email, password, role)
             VALUES (?, ?, ?, ?)
-        """, user)
+        """, name, email, hashed, role)
     cursor.execute(
         "UPDATE users SET specialization = ? WHERE email = ?",
         ("Mathematics", "math@example.com")
