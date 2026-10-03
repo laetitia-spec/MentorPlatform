@@ -435,5 +435,7 @@ def mentor_dashboard():
     
     conn.close()
     return render_template("mentor_dashboard.html", mentor=mentor)
+init_db()
+create_test_users()
 if __name__== "__main__":
     app.run(debug=True)
