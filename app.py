@@ -60,7 +60,7 @@ def create_test_users():
     ]
     for name, email, pwd, role in users_raw:
         hashed = generate_password_hash(pwd)
-        cursor.execute("INSERT OR IGNORE INTO users (name, email, password, role) VALUES (?, ?, ?, ?)" (name, email, hashed, role))
+        cursor.execute("INSERT OR IGNORE INTO users (name, email, password, role) VALUES (?, ?, ?, ?)", (name, email, hashed, role))
     cursor.execute(
         "UPDATE users SET specialization = ? WHERE email = ?",
         ("Mathematics", "math@example.com")
