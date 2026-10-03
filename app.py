@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, redirect, session, url_for
+from werkzeug.security import generate_password_hash, check_password_hash
 import sqlite3
 app = Flask(__name__)
 app.secret_key = "supersecret123"
@@ -48,14 +49,16 @@ init_db()
 def create_test_users():
     conn = sqlite3.connect("database.db")
     cursor = conn.cursor()
+    from werkzeug.security import generate_password_hash
     
-    users = [
+    users_raw = [
         ("Student One", "student@example.com", "1234", "student"),
         ("Math Mentor", "math@example.com", "1234", "mentor"),
         ("Programming Mentor", "programming@example.com", "1234", "mentor"),
         ("Physics Mentor", "physics@example.com", "1234", "mentor")
     ]
-    for user in users:
+    for name, email, pwd, role in users_raw:
+        hashed = generate_password_hash(pwd)
         cursor.execute("""
             INSERT OR IGNORE INTO users (name, email, password, role)
             VALUES (?, ?, ?, ?)
