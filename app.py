@@ -85,6 +85,28 @@ connection_requests = []
 def home():
     return render_template("login.html")
 
+@app.route("/signup", methods=["GET", "POST"])
+def signup():
+    if request.method == "POST":
+        name = request.form.get("name")
+        email = request.form.get("email")
+        password = request.form.get("password")
+        role = request.form.get("role")
+        
+        hashed = generate_password_hash(password)
+        
+        conn = sqlite3.connect("database.db")
+        cursor = conn.cursor()
+        try:
+            cursor.execute("INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)", (name, email, hashed, role))
+            conn.commit()
+        except:
+            return "Email already used"
+        finally:
+            conn.close()
+        return redirect(url_for("login"))
+    return render_template("signup.html")
+        
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
@@ -94,20 +116,18 @@ def login():
        conn = sqlite3.connect("database.db")
        cursor = conn.cursor()
        cursor.execute(
-           "SELECT id, name, email, password, role FROM users WHERE email = ? AND password = ?",
-           (email, password)
-       )
+           "SELECT id, name, email, password, role FROM users WHERE email =?", (email,))
        user = cursor.fetchone()
        conn.close()
        
-       if user:
+       if user and check_password_hash(user[3], password):
            session["user_id"] = user[0]
            session["name"] = user[1]
            session["role"] = user[4]
            
            if user[4] == "mentor":
-               return render_template("mentor_dashboard.html")
-           return render_template("dashboard.html")
+               return render_template("mentor_dashboard.html", name=user[1])
+           return render_template("dashboard.html", name=user[1])
        return "Invalid email or password"
     return render_template("login.html")
 
