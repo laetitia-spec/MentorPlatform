@@ -50,6 +50,7 @@ def create_test_users():
     conn = sqlite3.connect("database.db")
     cursor = conn.cursor()
     from werkzeug.security import generate_password_hash
+    cursor.execute("DELETE FROM users")
     
     users_raw = [
         ("Student One", "student@example.com", "1234", "student"),
@@ -59,10 +60,7 @@ def create_test_users():
     ]
     for name, email, pwd, role in users_raw:
         hashed = generate_password_hash(pwd)
-        cursor.execute("""
-            INSERT OR IGNORE INTO users (name, email, password, role)
-            VALUES (?, ?, ?, ?)
-        """, name, email, hashed, role)
+        cursor.execute("INSERT OR IGNORE INTO users (name, email, password, role) VALUES (?, ?, ?, ?)" (name, email, hashed, role))
     cursor.execute(
         "UPDATE users SET specialization = ? WHERE email = ?",
         ("Mathematics", "math@example.com")
