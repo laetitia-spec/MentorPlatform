@@ -9,9 +9,22 @@
     <p><strong>ID:</strong>{{ mentor[0] }}</p>
     <p><strong>Name:</strong>{{ mentor[1] }}</p>
     <p><strong>Email:</strong>{{ mentor[2] }}</p>
+
+    <hr>
+    <h3>Performances du mentor</h3>
+    {% for perf in mentor_performance %}
+    <p><br>{{ perf[2] }}</br> : {{ perf[3] }}</p>
+    {% endfor %}
+    {% elif pending_request %}
+    <p>Request Sent!</p>
     {% else %}
     <p>No mentor assigned yet {{ student_id }}.</p>
+    <form action="/request_mentor"method="post">
+        <input type="hidden"name="student_id"value="{{ student_id }}">
+        <button type="submit">Request a mentor</button>
+    </form>
     {% endif %}
+    <br>
     <a href="/student/{{ student_id }}"><button>Back</button></a>
 </body>
 </html>

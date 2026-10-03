@@ -1,6 +1,7 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect, session, url_for
 import sqlite3
 app = Flask(__name__)
+app.secret_key = "supersecret123"
 
 def init_db():
     conn = sqlite3.connect("database.db")
@@ -25,9 +26,21 @@ def init_db():
                 """)
     cursor.execute("PRAGMA table_info(users)")
     columns = [column[1] for column in cursor.fetchall()]
-    
+    cursor.execute("""
+                   CREATE TABLE IF NOT EXISTS mentor_performance(
+                       id INTEGER PRIMARY KEY AUTOINCREMENT,
+                       mentor_id INTEGER,
+                       subject TEXT,
+                       specialization TEXT
+                   )
+                """)
     if "specialization" not in columns:
         cursor.execute("ALTER TABLE users ADD COLUMN specialization TEXT")
+        cursor.execute("SELECT COUNT(*) FROM users WHERE role='mentor'")
+        if cursor.fetchone()[0] ==0:
+            cursor.execute("INSERT INTO users (name, email, password, role) VALUES ('Math Mentor', 'math@example.com', '123', 'mentor')")
+            mentor_id = cursor.lastrowid
+            cursor.execute("INSERT INTO mentor_performance (mentor_id, subject, specialization) VALUES (?, 'Mathematics', 'Algebra & Calculus')", (mentor_id,))
     conn.commit()
     conn.close()
 init_db()
@@ -71,12 +84,37 @@ connection_requests = []
 def home():
     return render_template("login.html")
 
-@app.route("/login", methods=["POST"])
+@app.route("/login", methods=["GET", "POST"])
 def login():
-    email = request.form["email"]
-    password = request.form["password"]
-    
-    return render_template("dashboard.html")
+    if request.method == "POST":
+       email = request.form["email"]
+       password = request.form["password"]
+       
+       conn = sqlite3.connect("database.db")
+       cursor = conn.cursor()
+       cursor.execute(
+           "SELECT id, name, email, password, role FROM users WHERE email = ? AND password = ?",
+           (email, password)
+       )
+       user = cursor.fetchone()
+       conn.close()
+       
+       if user:
+           session["user_id"] = user[0]
+           session["name"] = user[1]
+           session["role"] = user[4]
+           
+           if user[4] == "mentor":
+               return render_template("mentor_dashboard.html")
+           return render_template("dashboard.html")
+       return "Invalid email or password"
+    return render_template("login.html")
+
+@app.route("/logout")
+def logout():
+    session.clear()
+    return redirect("/login")
+
 @app.route("/dashboard")
 def dashboard():
     return render_template("dashboard.html")
@@ -89,7 +127,7 @@ def performance():
         "Physics": 58,
         "Computer Network": 80
     }
-    return render_template("performance.html", grades=grades) 
+    return render_template("performance.html", grades=grades, gardes=grades) 
 
 @app.route("/courses")
 def courses():
@@ -129,7 +167,7 @@ def recommendations():
 def connect():
     if request.method == "POST":
         
-        student_id = 1
+        student_id = 2
         mentor_id = request.form.get("mentor_id")
         
         conn = sqlite3.connect("database.db")
@@ -149,7 +187,7 @@ def connect():
             INSERT INTO connection_requests
             (student_id, mentor_id, status)
             VALUES (?, ?, ?)
-            """, (student_id, mentor_id, "Pending"))
+            """, (student_id, mentor_id, 'pending'))
         
         conn.commit()
         conn.close()
@@ -160,7 +198,9 @@ def connect():
     return render_template("connect.html", mentor_id=mentor_id)
 
 @app.route("/requests")
-def requests():
+def requests_page():
+    if "user_id" not in session:
+        return redirect("/login")
     conn = sqlite3.connect("database.db")
     cursor = conn.cursor()
     
@@ -220,7 +260,12 @@ def users():
 
 @app.route("/my_requests")
 def my_requests():
-    return render_template("my_requests.html")
+    conn = sqlite3.connect("database.db")
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM connection_requests WHERE student_id=2")
+    requests = cursor.fetchall()
+    conn.close()
+    return render_template("my_requests.html",requests=requests)
 
 @app.route("/connections")
 def connections():
@@ -285,7 +330,7 @@ def view_student(student_id):
     if student is None:
         return f"Student not found"
     
-    return render_template("student_profile.html", student=student)
+    return render_template("student_profile.html", student=student, mentor=student)
 
 @app.route("/student/<int:student_id>/performance")
 def student_performance(student_id):
@@ -304,31 +349,91 @@ def student_performance(student_id):
     }
     return render_template("student_performance.html", student=student, grades=grades)
 
-@app.route("/view_mentor")
+
 @app.route("/view_mentor/<int:student_id>")
-def view_mentor(student_id=None):
+def view_mentor(student_id):
     import sqlite3
     conn = sqlite3.connect("database.db")
-    cursor = conn.cursor()
+    c = conn.cursor()
+    
     mentor = None
-    pending_request = None
-    if student_id:
-        cursor.execute("""
-            SELECT users.id, users.name, users.email
-            FROM connections
-            JOIN users ON connections.mentor_id = users.id
-            WHERE connections.student_id =?
-            """, (student_id,))
-    mentor = cursor.fetchone()
-    if not mentor:
-        cursor.execute("""
-            SELECT id, mentor_id
-            FROM mentor_request
-            WHERE student_id =? AND status = "pending"
-            """, (student_id,))
-        pending_request = cursor.fetchone()
+    mentor_performance = [] 
+    pending_request = False
+    c.execute("SELECT mentor_id FROM connection_requests WHERE student_id=? AND LOWER (status)='accepted' LIMIT 1",(student_id,))
+    row = c.fetchone()
+    
+    if row:
+        mentor_id = row[0]
+        c.execute("SELECT * FROM users WHERE id =?", (mentor_id,))
+        mentor = c.fetchone()
+        c.execute("SELECT * FROM mentor_performance WHERE mentor_id =?", (mentor_id,))
+        mentor_performance = c.fetchall()
+    else:
+        c.execute("SELECT * FROM connection_requests WHERE student_id=? AND LOWER(status)='pending' LIMIT 1", (student_id,))
+        if c.fetchone():
+            pending_request = True  
     conn.close()
-    return render_template("view_mentor.html", mentor=mentor, pending_request=pending_request, student_id=student_id)
+    return render_template("view_mentor.html", student_id=student_id, mentor=mentor, mentor_performance = mentor_performance, pending_request = pending_request)
 
+@app.route("/request_mentor/<int:mentor_id>", methods=["POST"])
+def request_mentor(mentor_id):
+    student_id = session.get("user_id")
+    if not student_id:
+        return redirect("/login")
+    conn = sqlite3.connect("database.db")
+    cursor = conn.cursor()
+    cursor.execute("""
+            SELECT id FROM connection_requests
+            WHERE student_id = ? AND status = 'pending'
+            """, (student_id,))
+    if cursor.fetchone():
+        conn.close()
+        return "You already have a request pending"
+    cursor.execute("""
+            INSERT INTO connection_requests(student_id, mentor_id, status)
+            VALUES (?,?, "pending)
+            """, (student_id, mentor_id))
+    conn.commit()
+    conn.close()
+    return redirect(f"/view_mentor/{student_id}")
+    
+@app.route("/mentor_performance/<int:mentor_id>")
+def mentor_performance(mentor_id):
+    conn = sqlite3.connect("database.db")
+    cursor = conn.cursor()
+    cursor.execute("""
+            SLECT name, specialization
+            FROM users
+            WHERE id = ?
+            """, (mentor_id, ))
+    mentor = cursor.fetchone()
+    conn.close()
+    if mentor is None:
+        return "Mentor not found"
+    return render_template("mentor_performance.html", mentor=mentor)
+
+@app.route("/request_mentor", methods=["GET", "POST"])
+def request_mentor_simple():
+    import sqlite3 
+    conn = sqlite3.connect("database.db")
+    c = conn.cursor()
+    c.execute("INSERT INTO connection_requests (student_id, mentor_id, status) VALUES (2, 1, 'accepted')")
+    conn.commit()
+    conn.close()
+    return redirect("/view_mentor/2")
+
+@app.route("/mentor_dashboard")
+def mentor_dashboard():
+    if "user_id" not in session:
+        return redirect("/login")
+    
+    conn = sqlite3.connect("database.db")
+    cursor = conn.cursor()
+    
+    cursor.execute("SELECT * FROM users WHERE id=?", (session["user_id"],))
+    mentor = cursor.fetchone()
+    
+    conn.close()
+    return render_template("mentor_dashboard.html", mentor=mentor)
 if __name__== "__main__":
     app.run(debug=True)

@@ -7,43 +7,26 @@
 <body>
     <h1>Connection Requests</h1>
 
-    {% if connection_requests %}
-      <table border="1" cellpadding="10">
-        <tr>
-          <th>Student</th>
-          <th>Mentor</th>
-          <th>Specialization</th>
-          <th>Status</th>
-          <th>Action</th>
-        </tr>
+    {% for req in connection_requests %}
+    <p>
+      Student: {{ req[1] }} 
+      Mentor: {{ req[2] }} - {{ req[3] }} 
+      Status: {{ req[4] }}
+      <form action="/accept-request" method="post" style="display:inline;">
+        <input type="hidden" name="request_id" value="{{ req[0] }}">
+        <button type="submit">Accept</button>
+      </form>
 
-        {% for req in connection_requests %}
-        <tr>
-          <td>{{ req[1] }}</td>
-          <td>{{ req[2] }}</td>
-          <td>{{ req[3] }}</td>
-          <td>{{ req.[4] }}</td>
-          <td>
-            {% if req[4] == "Pending" %}
-
-              <form action="/accept-request" method="POST" style="display:inline;">
-                <input type="hidden" name="request_id" value="{{ req[0] }}">
-                <button type="submit">Accept</button>
-              </form>
-
-              <form action="/decline-request" method="POST" style="display:inline;">
-                <input type="hidden" name="request_id" value="{{ req[0] }}"> 
-                <button type="submit">Decline</button>
-              </form>
-            {% else %}
-              No action
-          {% endif %}
-          </td>
-        </tr>
-        {% endfor %}
-      </table>
+      <form action="/decline-request" method="POST" style="display:inline;">
+        <input type="hidden" name="request_id" value="{{ req[0] }}"> 
+        <button type="submit">Decline</button>
+      </form>
+    </p>
     {% else %}
     <p>No connection requests yet.</p>
-    {% endif %}   
+    {% endfor %}
+
+    <br>
+    <a href="/mentor_dashboard">Back</a> 
 </body>
 </html>

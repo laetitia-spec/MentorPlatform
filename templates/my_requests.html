@@ -1,12 +1,19 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>MyConnection Requests</title>
+    <title>My Connection Requests</title>
 </head>
 <body>
     <h1>My Connection Requests</h1>
-    <p>No connection requests yet.</p>
+    {% if requests %}
+    {% for r in requests %}
+    <p>ID: {{ r[0] }} | Student: {{ r[1] }} |Mentor: {{ r[2] }} | Status: <b>{{ r[3] }}</b></p>
+    {% endfor %}
+    {% else %}
+    <p>No connection request yet.</p>
+    {% endif %}
 
+    <br>
     <a href="/dashboard">Back to Dashboard</a>
 </body>
 </html>
