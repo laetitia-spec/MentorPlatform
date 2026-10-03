@@ -230,7 +230,9 @@ def requests_page():
         FROM connection_requests cr
         JOIN users s ON cr.student_id = s.id
         JOIN users m ON cr.mentor_id = m.id
-    """)
+        WHERE cr.mentor_id = ?
+        AND cr.status = 'pending'
+    """, (session["user_id"],))
     connection_requests = cursor.fetchall()
     conn.close()
     return render_template("requests.html", connection_requests=connection_requests) 
@@ -244,7 +246,7 @@ def accept_request():
     
     cursor.execute(
         "UPDATE connection_requests SET status = ? WHERE id = ?",
-        ("Accepted", request_id)
+        ("accepted", request_id)
     )
     conn.commit()
     conn.close()
@@ -259,7 +261,7 @@ def decline_request():
     
     cursor.execute(
         "UPDATE connection_requests SET status = ? WHERE id = ?",
-        ("Declined", request_id)
+        ("declined", request_id)
     )
     conn.commit()
     conn.close()
@@ -299,7 +301,7 @@ def connections():
                    SELECT u.name, u.specialization
                    FROM connection_requests cr
                    JOIN users u ON cr.mentor_id = u.id
-                   WHERE cr.student_id = ? AND cr.status = "Accepted"
+                   WHERE cr.student_id = ? AND cr.status = "accepted"
                    """, (student_id,))
     connections = cursor.fetchall()
     conn.close()
@@ -316,7 +318,7 @@ def mentor_connections():
                 FROM connection_requests cr
                 JOIN users s ON cr.student_id = s.id
                 JOIN users m ON cr.mentor_id = m.id
-                WHERE cr.status = "Accepted"
+                WHERE cr.status = "accepted"
                 """)
     connections = cursor.fetchall()
     conn.close()
@@ -331,7 +333,7 @@ def connected_students():
                 SELECT s.id, s.name, s.specialization, cr.status
                 FROM connection_requests cr
                 JOIN users s ON cr.student_id = s.id
-                WHERE cr.status = "Accepted"
+                WHERE cr.status = "accepted"
                 """)
     students = cursor.fetchall()
     conn.close()
